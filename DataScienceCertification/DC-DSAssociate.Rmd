@@ -2,12 +2,14 @@
 title: "DataCamp-DataScienceAssociate"
 author: "L Burleigh"
 date: "2023-06-26"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = 'C:/Users/larn_/OneDrive - Louisiana State University/Career')
+knitr::opts_knit$set(root.dir = 'C:/Users/larn_/Documents/GitHub/Workshops-Certifications/DataScienceCertification')
 ```
 
 ```{r load data, include=FALSE}
@@ -22,7 +24,7 @@ library(tibble)
 ### Task 1
 
 ```{r task1, include = FALSE}
-df <- read.csv("C:/Users/larn_/OneDrive - Louisiana State University/Career/fitness_class_2212.csv")
+df <- read.csv("fitness_class_2212.csv")
 
 which(is.na(df), arr.ind=TRUE)
 
@@ -83,7 +85,7 @@ After the data validation, the dataset contains 1500 rows and 8 columns.
 
 ### Task 2
 
-```{r task2, include = FALSE}
+```{r task2, echo = FALSE}
 
 showed <- df %>% filter(attended == 1) 
   
@@ -106,7 +108,7 @@ From Graph 2 Classes Attended, the most attended class category was HIIT with 21
 
 ### Task 3
 
-```{r task3, include = FALSE}
+```{r task3, echo = FALSE}
 
 ggplot(df, aes(months_as_member)) + 
   geom_histogram(bins = 30) + ggtitle("Graph 3-1 Membership Months Distribution")
@@ -128,7 +130,7 @@ The months_as_member variable is our target variable. Graph 3-1 Membership Month
 
 ### Task 4
 
-```{r task4, include = FALSE}
+```{r task4, echo = FALSE}
 
 ggplot(df, aes(attended, months_as_member)) + 
   geom_boxplot() + 
@@ -161,7 +163,7 @@ test_data <- df[-train_indices, ]
 
 ### Task 6
 
-```{r task6, include = FALSE}
+```{r task6, echo = FALSE}
 
 # Train the logistic regression model
 logreg_model <- glm(attended ~ . - booking_id, data = train_data, family = binomial)
@@ -171,8 +173,8 @@ logreg_pred <- predict(logreg_model, newdata = test_data, type = "response")
 logreg_predclass <- ifelse(logreg_pred >= 0.5, 1, 0)
 
 # Evaluate the model
-accuracy <- mean(logreg_predclass == test_data$attended)
-print(paste("Accuracy:", accuracy))
+logreg_accuracy <- mean(logreg_predclass == test_data$attended)
+print(paste("Accuracy:", logreg_accuracy))
 
 ```
 Baseline Model - Logistic Regression Model
@@ -181,7 +183,7 @@ Baseline Model - Logistic Regression Model
 
 ### Task 7
 
-```{r task7, include = FALSE}
+```{r task7, echo = FALSE}
 
 # Train the random forest model
 rf_model <- randomForest(attended ~ . - booking_id, data = train_data)
@@ -191,8 +193,8 @@ rf_pred <- predict(rf_model, newdata = test_data, type = "response")
 rf_predclass <- ifelse(rf_pred == 1, 0, 1)
 
 # Evaluate the model
-accuracy <- mean(rf_predclass == test_data$attended)
-print(paste("Accuracy:", accuracy))
+rf_accuracy <- mean(rf_predclass == test_data$attended)
+print(paste("Accuracy:", rf_accuracy))
 
 
 ```
@@ -208,7 +210,7 @@ I chose the Random Forest model as a comparison model because it can robustly ca
 
 ### Task 9
 
-```{r task9, include = FALSE}
+```{r task9, echo = FALSE}
 # Check the distribution of the target variable
 table(df$attended)
 
@@ -227,6 +229,7 @@ rf_f1 <- 2 * (rf_precision * rf_recall) / (rf_precision + rf_recall)
 
 # Create a table with evaluation metrics
 evaluation_table <- tibble(Method = c("Logistic Regression", "Random Forest"),
+                           Accuracy = c(logreg_accuracy, rf_accuracy),
                            Precision = c(logreg_precision, rf_precision),
                            Recall = c(logreg_recall, rf_recall),
                            F1_Score = c(logreg_f1, rf_f1))
@@ -241,4 +244,4 @@ I am choosing the evaluation metric(s) precision, recall, and F1 score due to th
 
 ### Task 10
 
-A larger precision, recall, and F1 score indicate a better performing model. While the Random Forest model has a higher recall, the Logistic Regression model has a higher precision and F1 score. The F1 score is a harmonic mean of the precision and recall, balancing between the two measures in which precision prioritizes cost of false positives and recall prioritizes cost of false negatives. Given the classification is regarding and imbalanced fitness class attendance and the consequences of false positives and false negatives for this variable are similar, I would prioritize the F1 score, indicating the Logistic Regression model performed better at predicting whether a member signed up will attend the class based on the variables collected in the data frame.
+A larger precision, recall, and F1 score indicate a better performing model. The Logistic Regression model has a higher precision, recall, and F1 score. The F1 score is a harmonic mean of the precision and recall, balancing between the two measures in which precision prioritizes cost of false positives and recall prioritizes cost of false negatives. Given the classification is regarding and imbalanced fitness class attendance and the consequences of false positives and false negatives for this variable are similar, I would prioritize the F1 score, indicating the Logistic Regression model performed better at predicting whether a member signed up will attend the class based on the variables collected in the data frame.
